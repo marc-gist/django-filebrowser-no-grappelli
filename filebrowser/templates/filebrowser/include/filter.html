@@ -1,9 +1,12 @@
 {% load i18n fb_tags %}
-<div id="changelist-filter">
-    <h2>{% trans 'Filter' %}</h2>
+<ul class="nav navbar-nav navbar-right" id="changelist-filter">
+{#<div id="changelist-filter">#}
+{#    <h2>{% trans 'Filter' %}</h2>#}
 
-    <h3>{% trans "By Date" %}</h3>
-    <ul>
+{#    <h3>{% trans "By Date" %}</h3>#}
+    <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">by Date <span class="caret"></span></a>
+    <ul class="dropdown-menu pull-right">
         <li{% if not query.filter_date %} class="selected"{% endif %}>
         <a href="{% query_string "" "filter_date,p" %}">{% trans "Any Date" %}</a></li>
         <li{% if query.filter_date == "today" %} class="selected"{% endif %}>
@@ -15,16 +18,19 @@
         <li{% if query.filter_date == "thisyear" %} class="selected"{% endif %}>
         <a href="{% query_string "" "filter_date,p" %}&amp;filter_date=thisyear">{% trans "This year" %}</a></li>
     </ul>
-
-    <h3>{% trans "By Type" %}</h3>
-    <ul>
+    </li>
+    <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">by Type <span class="caret"></span></a>
+        {#    <h3>{% trans "By Type" %}</h3>#}
+    <ul class="dropdown-menu pull-right">
         <li{% if not query.filter_type %} class="selected"{% endif %}>
         <a href="{% query_string "" "filter_type,p" %}">{% trans "All" %}</a></li>
-        <li{% if query.filter_type == 'Folder' %} class="selected"{% endif %}>
-        <a href="{% query_string "" "filter_type,p" %}&amp;filter_type=Folder">{% trans "Folder" %}</a></li>
         {% for extension in settings_var.EXTENSIONS %}
         <li{% if query.filter_type == extension %} class="selected"{% endif %}>
         <a href="{% query_string "" "filter_type,p" %}&amp;filter_type={{ extension }}">{% trans extension %}</a></li>
         {% endfor %}
     </ul>
-</div>
+    </li>
+
+{#</div>#}
+</ul>

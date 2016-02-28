@@ -1,29 +1,13 @@
 {% extends "admin/base_site.html" %}
 
 <!-- LOADING -->
-{% load admin_static i18n fb_tags fb_versions fb_compat %}
+{% load admin_static i18n fb_tags fb_versions %}
+
 
 <!-- STYLESHEETS -->
 {% block extrastyle %}
     {{ block.super }}
     <link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}" />
-{% endblock %}
-
-<!-- JAVASCRIPTS -->
-{% block extrahead %}
-    {{ block.super }}
-    <script type="text/javascript" src="{% static_jquery %}"></script>
-    <script type="text/javascript" src="{% static "admin/js/jquery.init.js" %}"></script>
-    <script type="text/javascript">
-    (function($) {
-        $(document).ready(function() {
-            // remove edit module if no actions are given
-            if ($("select#id_custom_action").find("option").length <= 1) {
-                $("fieldset#fieldset_edit").hide();
-            }
-        });
-    })(django.jQuery);
-    </script>
 {% endblock %}
 
 <!-- COLTYPE/BODYCLASS -->
@@ -49,7 +33,8 @@
                     </div>
                 </div>
             </fieldset>
-            <fieldset class="module aligned" id="fieldset_edit">
+            {% if fileobject.filetype == "Image" %}
+            <fieldset class="module aligned">
                 <h2>{% trans "Edit" %}</h2>
                 <div class="form-row {% if form.custom_action.errors %}errors{% endif %}">
                     {% if form.custom_action.errors %}{{ form.custom_action.errors }}{% endif %}
@@ -60,6 +45,7 @@
                     </div>
                 </div>
             </fieldset>
+            {% endif %}
             {% if fileobject.filetype == "Folder" %}
             <fieldset class="module aligned">
                 <h2>{% trans "Folder Information" %}</h2>

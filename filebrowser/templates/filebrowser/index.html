@@ -1,7 +1,7 @@
 {% extends "admin/base_site.html" %}
 
 <!-- LOADING -->
-{% load admin_static i18n fb_tags fb_pagination fb_compat %}
+{% load admin_static i18n fb_tags fb_pagination %}
 
 <!-- STYLESHEETS -->
 {% block extrastyle %}
@@ -13,7 +13,7 @@
 <!-- JAVASCRIPTS -->
 {% block extrahead %}
     {{ block.super }}
-    <script type="text/javascript" src="{% static_jquery %}"></script>
+    <script type="text/javascript" src="{% static "admin/js/jquery.min.js" %}"></script>
     <script type="text/javascript" src="{% static "admin/js/jquery.init.js" %}"></script>
     {% ifequal query.pop '1' %} <!-- FileBrowseField -->
     <script language="javascript" type="text/javascript" src="{% static "filebrowser/js/FB_FileBrowseField.js" %}"></script>
@@ -26,41 +26,38 @@
     {% ifequal query.pop '3' %} <!-- CKeditor (former "FCKeditor") -->
     <script language="javascript" type="text/javascript" src="{% static "filebrowser/js/FB_CKEditor.js" %}"></script>
     {% endifequal %}
-    {% ifequal query.pop '4' %} <!-- TinyMCE -->
-    <script language="javascript" type="text/javascript" src="{% static "filebrowser/js/FB_TinyMCEv4.js" %}"></script>
-    {% endifequal %}
     {{ media }}
     <script type="text/javascript" charset="utf-8">
-        (function($) {
-            $(document).ready(function() {
-                $("a.pulldown-versions-handler").bind("click", function() {
-                    if (!$(this).parent().hasClass("open")) {
-                        $("tr").removeClass("selected");
-                        $(".pulldown-versions-container").removeClass("open");
-                        $(this).parent().addClass("open");
-                        $(this).parent().parent().parent().addClass("selected");
-                    } else {
-                        $(this).parent().removeClass("open");
-                        $(this).parent().parent().parent().removeClass("selected");
-                    }
-                });
-                $(document).keypress(function(evt) {
-                    if (evt.keyCode == '27') {
-                        $(".pulldown-versions-container:visible").removeClass("open");
-                        $(".pulldown-versions-container").parent().parent().removeClass("selected");
-                    }
-                });
-                $(document).mousedown(function(evt) {
-                    if ($(".pulldown-versions-container").is(":visible")) {
-                        var $target = $(evt.target);
-                        if (!$(evt.target).hasClass("pulldown-versions-container") && $target.parents(".pulldown-versions-container").length == 0) {
-                            $(".pulldown-versions-container").removeClass("open");
-                            $(".pulldown-versions-container").parent().parent().removeClass("selected");
-                        }
-                    }
-                });
-            });
-        })(django.jQuery);
+{#        (function($) {#}
+{#            $(document).ready(function() {#}
+{#                $("a.pulldown-versions-handler").bind("click", function() {#}
+{#                    if (!$(this).parent().hasClass("open")) {#}
+{#                        $("tr").removeClass("selected");#}
+{#                        $(".pulldown-versions-container").removeClass("open");#}
+{#                        $(this).parent().addClass("open");#}
+{#                        $(this).parent().parent().parent().addClass("selected");#}
+{#                    } else {#}
+{#                        $(this).parent().removeClass("open");#}
+{#                        $(this).parent().parent().parent().removeClass("selected");#}
+{#                    }#}
+{#                });#}
+{#                $(document).keypress(function(evt) {#}
+{#                    if (evt.keyCode == '27') {#}
+{#                        $(".pulldown-versions-container:visible").removeClass("open");#}
+{#                        $(".pulldown-versions-container").parent().parent().removeClass("selected");#}
+{#                    }#}
+{#                });#}
+{#                $(document).mousedown(function(evt) {#}
+{#                    if ($(".pulldown-versions-container").is(":visible")) {#}
+{#                        var $target = $(evt.target);#}
+{#                        if (!$(evt.target).hasClass("pulldown-versions-container") && $target.parents(".pulldown-versions-container").length == 0) {#}
+{#                            $(".pulldown-versions-container").removeClass("open");#}
+{#                            $(".pulldown-versions-container").parent().parent().removeClass("selected");#}
+{#                        }#}
+{#                    }#}
+{#                });#}
+{#            });#}
+{#        })(django.jQuery);#}
     </script>
 {% endblock %}
 
@@ -71,23 +68,19 @@
 <!-- BREADCRUMBS -->
 {% block breadcrumbs %}{% include "filebrowser/include/breadcrumbs.html" %}{% endblock %}
 
-<!-- CONTENT -->
-{% block content %}
-    <div id="content-main">
-        <!-- OBJECT-TOOLS -->
+<!-- OBJECT-TOOLS -->
         {% block object-tools %}
-            <ul class="object-tools">
-                <li><a href="{% url 'filebrowser:fb_createdir' %}{% query_string '' 'p' %}">{% trans "New Folder" %}</a></li>
+        <div id="content-navbar-collapse" class="navbar-collapse collapse">
+            <ul class="object-tools nav navbar-nav">
+                <li><a href="{% url 'filebrowser:fb_createdir' %}{% query_string '' 'p' %}">{% trans "+New Folder" %}</a></li>
                 <li><a href="{% url 'filebrowser:fb_upload' %}{% query_string '' 'p' %}" >{% trans "Upload" %}</a></li>
             </ul>
-        {% endblock %}
 
-        <div class="module filtered" id="changelist">
             <!-- SEARCH -->
             {% block search %}
-                <div id="toolbar"><form id="changelist-search" action="" method="get">
-                <div><!-- DIV needed for valid HTML -->
-                <label for="searchbar"><img src="{% static_search_icon %}" alt="Search" /></label>
+                <form class="navbar-form navbar-right" id="changelist-search" action="" method="get">
+                <div class="form-group"><!-- DIV needed for valid HTML -->
+                <label for="searchbar"><img src="{% static "admin/img/icon_searchbox.png" %}" alt="Search" /></label>
                 <input type="text" size="40" name="q" value="{{ query.q }}" id="searchbar" />
                 <input type="submit" value="{% trans 'Search' %}" />
                 {% if query.filter_type %}<input type="hidden" name="filter_type" value="{{ query.filter_type }}" />{% endif %}
@@ -103,7 +96,7 @@
                     {% if query.CKEditorFuncNum %}<input type="hidden" name="CKEditorFuncNum" value="{{ query.CKEditorFuncNum }}" />{% endif %}
                 {% endifequal %}
                 </div>
-                </form></div>
+                </form>
                 <script type="text/javascript">document.getElementById("searchbar").focus();</script>
             {% endblock %}
             {% block filters %}
@@ -111,21 +104,28 @@
                 {% include "filebrowser/include/filter.html" %}
             {% endblock %}
 
-            <form id="changelist-form" action="" method="post">{% csrf_token %}
-                <!-- RESULTS -->
-                {% if filelisting.results_current %}
-                <div class="results">
-                    <table id="result_list">
-                        {% include "filebrowser/include/tableheader.html" %}
-                        <tbody>
-                        {% include "filebrowser/include/filelisting.html" %}
-                        </tbody>
-                    </table>
-                </div>
-                {% endif %}
 
-                {% pagination %}
-            </form>
         </div>
+        {% endblock %}
+
+<!-- CONTENT -->
+{% block content %}
+    <div id="content-main">
+    <form id="changelist-form" action="" method="post">{% csrf_token %}
+        <!-- RESULTS -->
+        {% if filelisting.results_current %}
+        <div class="results">
+            <table class="table table-bordered" id="result_list">
+                {% include "filebrowser/include/tableheader.html" %}
+                <tbody>
+                {% include "filebrowser/include/filelisting.html" %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+        {% pagination %}
+    </form>
+
     </div>
 {% endblock %}
