@@ -82,7 +82,7 @@ class FileBrowseFormField(forms.CharField):
         return value
 
 
-class FileBrowseField(with_metaclass(models.SubfieldBase, CharField)):
+class FileBrowseField(models.CharField):
     description = "FileBrowseField"
 
     def __init__(self, *args, **kwargs):
@@ -97,10 +97,15 @@ class FileBrowseField(with_metaclass(models.SubfieldBase, CharField)):
             return value
         return FileObject(value, site=self.site)
 
-    def get_prep_value(self, value):
-        if not value:
+    def from_db_value(self, value, expression, connection, context):
+        if not value or isinstance(value, FileObject):
             return value
-        return value.path
+        return FileObject(value, site=self.site)
+
+    def get_prep_value(self, value):
+        if not value or isinstance(value, FileObject):
+            return value
+        return FileObject(value, site=self.site).path
 
     def value_to_string(self, obj):
         value = self._get_val_from_obj(obj)
@@ -207,7 +212,7 @@ class FileBrowseUploadField(CharField):
     """
 
     description = "FileBrowseUploadField"
-    __metaclass__ = models.SubfieldBase
+    # __metaclass__ = models.SubfieldBase
 
     def __init__(self, *args, **kwargs):
         self.site = kwargs.pop('site', site)
@@ -222,6 +227,11 @@ class FileBrowseUploadField(CharField):
         if not value or isinstance(value, FileObject):
             return value
         return FileObject(value, site=self.site)
+
+    # def get_prep_value(self, value):
+    #     if not value or isinstance(value, FileObject):
+    #         return value
+    #     return FileObject(value, site=self.site)
 
     def get_db_prep_value(self, value, connection, prepared=False):
         if not value:
