@@ -20,6 +20,10 @@
 <!-- CONTENT -->
 {% block content %}
 <div id="content-main">
+    <!-- POP-UP BREADCRUMBS -->
+    {% if query.pop %}
+        {% include "filebrowser/include/breadcrumbs.html" %}
+    {% endif %}
     <form action="{% query_string "" "filter_date,filter_type,q,p" %}" method="post">{% csrf_token %}
         <div>
             {% if form.errors %}<p class="errornote">{% trans 'Please correct the following errors.' %}</p>{% endif %}
@@ -111,7 +115,7 @@
                 {% endif %}
                 {% if settings_var.ADMIN_VERSIONS %}
                     {% for version in settings_var.ADMIN_VERSIONS %}
-                        {% version_object fileobject version as image_version %}
+                        {% version fileobject version as image_version %}
                         {% version_setting version %}
                         <div class="form-row">
                             <div>
