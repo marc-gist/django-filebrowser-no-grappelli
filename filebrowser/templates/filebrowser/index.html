@@ -146,9 +146,6 @@
         </div>
         {% endblock %}
 
-<!-- CONTENT -->
-{% block content %}
-    <div id="content-main">
     <form id="changelist-form" action="" method="post">{% csrf_token %}
         <!-- RESULTS -->
         {% if filelisting.results_current %}
