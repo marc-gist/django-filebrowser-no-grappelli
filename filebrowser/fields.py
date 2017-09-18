@@ -2,7 +2,7 @@
 import os
 
 from django import forms
-from django.core import urlresolvers
+from django import urls as urlresolvers
 from django.db.models.fields import CharField
 from django.forms.widgets import Input
 from django.template.loader import render_to_string
