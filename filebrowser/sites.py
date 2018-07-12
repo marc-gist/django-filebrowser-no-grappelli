@@ -9,10 +9,14 @@ from django import forms
 from django import VERSION as DJANGO_VERSION
 from django.contrib import messages
 from django.contrib.admin.sites import site as admin_site
+from django.utils.module_loading import import_string 
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.files.storage import DefaultStorage, default_storage, FileSystemStorage
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
-from django.urls import reverse, get_urlconf, get_resolver
+try:
+    from django.urls import reverse, get_urlconf, get_resolver
+except ImportError:
+    from django.core.urlresolvers import reverse, get_urlconf, get_resolver
 from django.http import HttpResponseRedirect, HttpResponseBadRequest
 from django.shortcuts import render, HttpResponse
 from django.template import RequestContext as Context
@@ -29,9 +33,16 @@ from filebrowser.decorators import path_exists, file_exists
 from filebrowser.storage import FileSystemStorageMixin
 from filebrowser.templatetags.fb_tags import query_helper
 from filebrowser.utils import convert_filename
-from filebrowser.settings import (DIRECTORY, EXTENSIONS, SELECT_FORMATS, ADMIN_VERSIONS, ADMIN_THUMBNAIL, MAX_UPLOAD_SIZE, NORMALIZE_FILENAME,
-                                  CONVERT_FILENAME, SEARCH_TRAVERSE, EXCLUDE, VERSIONS, VERSIONS_BASEDIR, EXTENSION_LIST, DEFAULT_SORTING_BY, DEFAULT_SORTING_ORDER,
-                                  LIST_PER_PAGE, OVERWRITE_EXISTING, DEFAULT_PERMISSIONS, UPLOAD_TEMPDIR)
+from filebrowser.settings import (DIRECTORY, EXTENSIONS, SELECT_FORMATS, ADMIN_VERSIONS, ADMIN_THUMBNAIL, 
+    MAX_UPLOAD_SIZE, NORMALIZE_FILENAME, CONVERT_FILENAME, SEARCH_TRAVERSE, EXCLUDE, VERSIONS, 
+    VERSIONS_BASEDIR, EXTENSION_LIST, DEFAULT_SORTING_BY, DEFAULT_SORTING_ORDER, LIST_PER_PAGE,
+    OVERWRITE_EXISTING, DEFAULT_PERMISSIONS, UPLOAD_TEMPDIR, ADMIN_CUSTOM
+)
+
+
+
+# This use admin_custom and not admin.sites.site of Django.
+admin_site = import_string(ADMIN_CUSTOM) if ADMIN_CUSTOM else admin_site
 
 
 # Add some required methods to FileSystemStorage
@@ -329,7 +340,6 @@ class FileBrowserSite(object):
             page = p.page(p.num_pages)
 
         request.current_app = self.name
-
         return TemplateResponse(request, 'filebrowser/index.html', dict(
             admin_site.each_context(request),
             **{
@@ -374,7 +384,6 @@ class FileBrowserSite(object):
             form = CreateDirForm(path, filebrowser_site=self)
 
         request.current_app = self.name
-
         return TemplateResponse(request, 'filebrowser/createdir.html', dict(
             admin_site.each_context(request),
             **{
@@ -394,7 +403,6 @@ class FileBrowserSite(object):
         query = request.GET
 
         request.current_app = self.name
-
         return TemplateResponse(request, 'filebrowser/upload.html', dict(
             admin_site.each_context(request),
             **{
@@ -407,7 +415,6 @@ class FileBrowserSite(object):
                 'filebrowser_site': self
             }
         ))
-
 
     def delete_confirm(self, request):
         "Delete existing File/Directory."
@@ -431,7 +438,6 @@ class FileBrowserSite(object):
             additional_files = None
 
         request.current_app = self.name
-
         return TemplateResponse(request, 'filebrowser/delete_confirm.html', dict(
             admin_site.each_context(request),
             **{
@@ -447,7 +453,6 @@ class FileBrowserSite(object):
                 'filebrowser_site': self
             }
         ))
-
 
     def delete(self, request):
         "Delete existing File/Directory."
@@ -512,7 +517,6 @@ class FileBrowserSite(object):
             form = ChangeForm(initial={"name": fileobject.filename}, path=path, fileobject=fileobject, filebrowser_site=self)
 
         request.current_app = self.name
-
         return TemplateResponse(request, 'filebrowser/detail.html', dict(
             admin_site.each_context(request),
             **{
@@ -528,7 +532,6 @@ class FileBrowserSite(object):
             }
         ))
 
-
     def version(self, request):
         """
         Version detail.
@@ -539,7 +542,6 @@ class FileBrowserSite(object):
         fileobject = FileObject(os.path.join(path, query.get('filename', '')), site=self)
 
         request.current_app = self.name
-
         return TemplateResponse(request, 'filebrowser/version.html', dict(
             admin_site.each_context(request),
             **{

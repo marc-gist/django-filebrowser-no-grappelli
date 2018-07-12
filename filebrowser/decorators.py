@@ -4,7 +4,10 @@ import os
 
 from django.contrib import messages
 from django.core.exceptions import ImproperlyConfigured
-from django.urls import reverse
+try:
+    from django.urls import reverse
+except ImportError:
+    from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.utils.encoding import smart_text
 from django.utils.translation import ugettext as _
@@ -34,7 +37,7 @@ def path_exists(site, function):
         # TODO: This check should be moved to a better location than a decorator
         if get_path('', site=site) is None:
             # The storage location does not exist, raise an error to prevent eternal redirecting.
-            raise ImproperlyConfigured(_("Error finding Upload-Folder (site.storage.location + site.directory). Maybe it does not exist? %s" % os.path.join(site.directory, '')))
+            raise ImproperlyConfigured(_("Error finding Upload-Folder (site.storage.location + site.directory). Maybe it does not exist?"))
         if get_path(request.GET.get('dir', ''), site=site) is None:
             msg = _('The requested Folder does not exist.')
             messages.add_message(request, messages.ERROR, msg)

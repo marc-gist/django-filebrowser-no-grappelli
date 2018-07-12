@@ -2,7 +2,10 @@
 import os
 
 from django import forms
-from django import urls as urlresolvers
+try:
+    from django.urls import reverse
+except ImportError:
+    from django.core.urlresolvers import reverse
 from django.db.models.fields import CharField
 from django.forms.widgets import Input
 from django.template.loader import render_to_string
@@ -34,7 +37,7 @@ class FileBrowseWidget(Input):
         super(FileBrowseWidget, self).__init__(attrs)
 
     def render(self, name, value, attrs=None):
-        url = urlresolvers.reverse(self.site.name + ":fb_browse")
+        url = reverse(self.site.name + ":fb_browse")
         if value is None:
             value = ""
         if value != "" and not isinstance(value, FileObject):
@@ -108,12 +111,12 @@ class FileBrowseField(CharField):
         return self.to_python(value)
 
     def get_prep_value(self, value):
-        if not value or isinstance(value, FileObject):
+        if not value:
             return value
-        return FileObject(value, site=self.site).path
+        return value.path
 
     def value_to_string(self, obj):
-        value = self._get_val_from_obj(obj)
+        value = self.value_from_object(obj)
         if not value:
             return value
         return value.path
@@ -162,7 +165,7 @@ class FileBrowseUploadWidget(Input):
         super(FileBrowseUploadWidget, self).__init__(attrs)
 
     def render(self, name, value, attrs=None):
-        url = urlresolvers.reverse(self.site.name + ":fb_browse")
+        url = reverse(self.site.name + ":fb_browse")
         if value is None:
             value = ""
         if value != "" and not isinstance(value, FileObject):
@@ -245,18 +248,13 @@ class FileBrowseUploadField(CharField):
             return value
         return FileObject(value, site=self.site)
 
-    # def get_prep_value(self, value):
-    #     if not value or isinstance(value, FileObject):
-    #         return value
-    #     return FileObject(value, site=self.site)
-
     def get_db_prep_value(self, value, connection, prepared=False):
         if not value:
             return value
         return value.path
 
     def value_to_string(self, obj):
-        value = self._get_val_from_obj(obj)
+        value = self.value_from_object(obj)
         if not value:
             return value
         return value.path
